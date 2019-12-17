@@ -1,16 +1,42 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 import {VideoPlaylistData,VideoMetaDataList} from '../videoData'
 import PlayListCard from '../playlistcard/playListCard'
 import './watchPage.css'
+
 class WatchPage extends Component {
     state = {
         currentVideoCardPos : 0,
-        videoMetaData : VideoMetaDataList[0],
-        videoPlayList : VideoPlaylistData
+        videoMetaData: VideoMetaDataList[2],
+        videoPlayList : VideoPlaylistData    
     }
-    onVideoClick=(pos)=>{
-        this.setState({videoMetaData: VideoMetaDataList[pos],currentVideoCardPos:pos})
+    onVideoClick = (pos) => {
+        this.setState({videoMetaData: VideoMetaDataList[pos], currentVideoCardPos: pos});
+      }
+      getVideoDataFromBackend = () => {
+        const videoId = this.props.match.params.id;
+        if(videoId !== undefined && videoId !== null && videoId !== '' && parseInt(videoId) > 0) {
+            axios.get(`http://5d76bf96515d1a0014085cf9.mockapi.io/video/${videoId}`)
+            .then(response => {
+              
+                this.setState({videoMetaData: response.data});
+            })
+            .catch(err => {
+                console.log(err);
+            })
+        }
     }
+
+    componentDidMount() {
+        this.getVideoDataFromBackend();
+    }
+
+    componentDidUpdate() {
+        this.getVideoDataFromBackend();
+    }
+
+
+  
     
     render() {
         const VideoPlayList = this.state.videoPlayList.map((item, pos) => {
